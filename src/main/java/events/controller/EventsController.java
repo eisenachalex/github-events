@@ -27,11 +27,12 @@ public class EventsController {
 
     @RequestMapping(value = "/events", produces = "application/json")
     @ResponseBody
-    public String index(
+    public ResponseEntity<Object[]> getEvents(
             @RequestParam String username,
             @RequestParam String repo,
             @RequestParam String event
     ){
+        Object[] eventArray;
         String url = buildUrl(username, repo);
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -41,16 +42,17 @@ public class EventsController {
         try {
             ObjectMapper mapper = new ObjectMapper();
             List events = mapper.readValue(responseEntity.getBody(), List.class);
-            Object[] eventArray= events
+            eventArray = events
                     .stream()
                     .filter(student -> ((Map)student).get("type").equals(event))
                     .toArray();
+
         } catch(Exception e){
-           System.out.println("error making request");
+           return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
 
 
-        return responseEntity.getBody();
+        return new ResponseEntity<Object[]>(eventArray, HttpStatus.OK);
     }
 
     private String buildUrl(String username, String repo){

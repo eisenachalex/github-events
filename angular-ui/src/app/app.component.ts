@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { EventService} from './event.service'
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,23 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'angular-ui';
+  private data = []
+  constructor(private eventService:EventService){
+
+  }
+
+  ngOnInit(){
+    this.getEvents("eisenachalex", "github-events", "")
+  }
+
+  getEvents(username, repo, event){
+      this.eventService.getEvents(username, repo, event).subscribe(
+        (data: any) => {
+        this.data = data;
+        },
+        err => {
+          console.log(err)
+        }
+      )
+  }
 }
